@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>MANN CO. LOGIN</title>
+</head>
+<body>
+    <div class="terminal-box">
+        <h2>Mission Briefing</h2>
+        
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="flash-msg">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="text" name="username" placeholder="MERCENARY NAME" required>
+            <input type="password" name="password" placeholder="SECRET PASSCODE" required>
+            <button type="submit">Authenticate</button>
+        </form>
+        <p style="font-size: 0.7em; margin-top: 15px;">
+            NEW RECRUIT? <a href="{{ url_for('signup') }}" style="color: #5b7a8c;">ENLIST HERE</a>
+        </p>
+    </div>
+</body>
+</html>

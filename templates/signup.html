@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>JOIN RED TEAM</title>
+</head>
+<body>
+    <div class="terminal-box" style="border-color: #5b7a8c;"> <h2 style="color: #5b7a8c;">Enlistment Form</h2>
+        
+        <form method="POST">
+            <input type="email" name="email" placeholder="OFFICIAL EMAIL (@)" required>
+            <input type="text" name="username" placeholder="CHOOSE CODENAME" required>
+            <input type="password" name="password" placeholder="SET PASSCODE" required>
+            <button type="submit" style="background: #5b7a8c;">Join the Fight</button>
+        </form>
+        
+        <p style="font-size: 0.7em; margin-top: 15px;">
+            ALREADY IN THE BASE? <a href="{{ url_for('login') }}" style="color: #b8383b;">LOG IN</a>
+        </p>
+    </div>
+</body>
+</html>

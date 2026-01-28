@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>MANN CO. MEME REPOSITORY</title>
+</head>
+<body class="red-team">
+
+    <nav class="tf-nav">
+    <div class="nav-left">
+        <a href="{{ url_for('index') }}">HOME</a>
+        <a href="{{ url_for('profile') }}">PERSONNEL FILE</a>
+        <button id="mute-btn" onclick="toggleMute()" class="mute-toggle">🔊</button>
+    </div>
+    <div class="nav-right">
+        <span class="user-tag">{{ current_user.username }}</span>
+        
+        <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" class="circle-pfp">
+        <a href="{{ url_for('logout') }}" class="logout-btn">Log out</a>
+    </div>
+    </nav>
+
+
+   
+    <div class="class-selection">
+        <h2>SELECT YOUR CLASS</h2>
+        <div class="class-grid">
+            {% for cls in classes %}
+            <div class="class-card" onmouseenter="playClassSound('{{ cls }}')">
+                <img src="{{ url_for('static', filename='images/classes/' + cls + '.png') }}" alt="{{ cls }}">
+                <p>{{ cls.upper() }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <audio id="class-audio" style="display:none;"></audio>
+
+    <script>
+        var isMuted = localStorage.getItem('tf2_muted') === 'true';
+
+        function updateButtonUI() {
+            var btn = document.getElementById('mute-btn');
+            if (btn) {
+                btn.innerText = isMuted ? "🔈" : "🔊";
+                if (isMuted) {
+                    btn.classList.add('muted');
+                } else {
+                    btn.classList.remove('muted');
+                }
+            }
+        }
+
+        window.addEventListener('load', updateButtonUI);
+     
+        function toggleMute() {
+            isMuted = !isMuted;
+
+            localStorage.setItem('tf2_muted', isMuted);
+            var btn = document.getElementById('mute-btn');
+            var audio = document.getElementById('class-audio');
+            
+                
+            if (isMuted) {
+                btn.innerText = "🔈";
+                btn.classList.add('muted');
+                if (audio) {
+                    audio.pause(); // Stop immediately
+                    audio.currentTime = 0; 
+                }
+            } else {
+                btn.innerText = "🔊";
+                btn.classList.remove('muted');
+            }
+                
+        }
+    function playClassSound(className) {
+    // This is the gatekeeper. If isMuted is true, the rest of the code is ignored
+        if (isMuted === true) {
+            return; 
+        }
+
+        var audio = document.getElementById('class-audio');
+        if (audio) {
+            audio.src = "{{ url_for('static', filename='sounds/classes/') }}" + className + ".mp3";
+            audio.volume = 0.5;
+            audio.play().catch(function(error) {
+                console.log("Playback blocked: " + error);
+            });
+        }
+    }
+    </script>
+
+    <div class="terminal-box" style="margin-top: 50px;">
+        <h3>TRANSMIT INTEL</h3>
+        <form method="POST" enctype="multipart/form-data">
+            <textarea name="content" placeholder="Enter message here..."></textarea>
+            
+            <input type="file" name="post_image" id="intel-upload" accept="image/*" hidden>
+            
+            <label for="intel-upload" class="custom-file-upload">
+                ATTACH INTEL PHOTO
+            </label>
+
+            <button type="submit" class="tf-button-send">SEND BROADCAST</button>
+        </form>
+    </div>
+    
+    <div class="intel-feed">
+        {% for post in posts %}
+        <div class="post-card">
+            <div class="post-header">
+                <img src="{{ url_for('static', filename='profile_pics/' + post.author.profile_pic) }}" class="circle-pfp" style="width:30px; height:30px;">
+                <strong>{{ post.author.username }}</strong>
+                <small>{{ post.date_posted.strftime('%H:%M') }}</small>
+                
+                {% if post.author == current_user %}
+                <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" style="margin-left: auto;">
+                    <button type="submit" class="redact-btn">REDACT</button>
+                </form>
+                {% endif %}
+            </div>
+            
+            <p>{{ post.content }}</p>
+
+            {% if post.image_file %}
+            <img src="{{ url_for('static', filename='post_pics/' + post.image_file) }}" class="post-img">
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+
+
+    <div class="gallery">
+        {% for meme in memes %}
+            <div class="meme-card">
+                <img src="{{ url_for('static', filename='images/' + meme) }}" alt="TF2 Meme">
+                <div class="caption">Item: {{ meme }}</div>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>PERSONNEL FILE</title>
+</head>
+<body style="padding-top: 100px;"> <div class="terminal-box">
+
+    <nav class="tf-nav">
+        <div class="nav-left">
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('profile') }}">Personnel File</a>
+        </div>
+        <div class="nav-right">
+            
+            <span class="user-tag" style="color: #ffca28; margin-right: 15px; font-weight: bold;">
+                {{ current_user.username }}
+            </span>
+            <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" class="circle-pfp">
+            <a href="{{ url_for('logout') }}" class="logout-btn">Log out</a>
+        </div>
+    </nav>
+
+    <div class="profile-container">
+        <h2>IDENTIFICATION CARD</h2>
+        <img src="{{ url_for('static', filename='profile_pics/' + user.profile_pic) }}" class="circle-pfp" style="width: 150px; height: 150px;">
+        
+        <div style="text-align: left; margin: 20px 0;">
+            <p><strong>CODENAME:</strong> {{ user.username }}</p>
+            <p><strong>RECRUIT EMAIL:</strong> {{ user.email }}</p>
+        </div>
+
+            
+
+    <form method="POST" enctype="multipart/form-data" class="upload-form">
+            <input type="file" name="pic" id="file-upload" accept="image/*" hidden>
+    
+            <label for="file-upload" class="custom-file-upload">
+                SELECT PERSONNEL PHOTO
+            </label>
+    
+            <br>
+    
+            <button type="submit" class="tf-button-prof">UPDATE FILE</button>
+    </form>
+
+
+                    
+    </div>
+</body>
+</html>
