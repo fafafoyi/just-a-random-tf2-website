@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'heavy-weapons-guy-secret' # Change this!
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-only-key')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 
 db = SQLAlchemy(app)
@@ -75,10 +75,10 @@ def index():
 def signup():
     if request.method == 'POST':
         username = request.form.get('username')
-        email = request.form.get('email')  # 1. Capture the email from the form
+        email = request.form.get('email')  
         password = request.form.get('password')
         
-        # 2. Check if username OR email already exists
+        #Checks if username OR email already exists
         existing_user = User.query.filter_by(username=username).first()
         existing_email = User.query.filter_by(email=email).first()
         
@@ -90,11 +90,11 @@ def signup():
             flash('This email is already registered to another mercenary!')
             return redirect(url_for('signup'))
         
-        # 3. Create the user with the email included
+        #Create the user with the email included
         hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
         user_to_add = User(username=username, email=email, password=hashed_pw)
         
-        # 4. Save to database
+        #Save to database
         try:
             db.session.add(user_to_add)
             db.session.commit()

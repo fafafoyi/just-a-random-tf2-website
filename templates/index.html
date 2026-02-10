@@ -7,17 +7,17 @@
 <body class="red-team">
 
     <nav class="tf-nav">
-    <div class="nav-left">
-        <a href="{{ url_for('index') }}">HOME</a>
-        <a href="{{ url_for('profile') }}">PERSONNEL FILE</a>
-        <button id="mute-btn" onclick="toggleMute()" class="mute-toggle">🔊</button>
-    </div>
-    <div class="nav-right">
-        <span class="user-tag">{{ current_user.username }}</span>
-        
-        <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" class="circle-pfp">
-        <a href="{{ url_for('logout') }}" class="logout-btn">Log out</a>
-    </div>
+        <div class="nav-left">
+            <a href="{{ url_for('index') }}">HOME</a>
+            <a href="{{ url_for('profile') }}">PERSONNEL FILE</a>
+            <button id="mute-btn" onclick="toggleMute()" class="mute-toggle">🔊</button>
+        </div>
+        <div class="nav-right">
+            <span class="user-tag">{{ current_user.username }}</span>
+            
+            <img src="{{ url_for('static', filename='profile_pics/' + current_user.profile_pic) }}" class="circle-pfp">
+            <a href="{{ url_for('logout') }}" class="logout-btn">Log out</a>
+        </div>
     </nav>
 
 
@@ -75,7 +75,7 @@
                 
         }
     function playClassSound(className) {
-    // This is the gatekeeper. If isMuted is true, the rest of the code is ignored
+    //If isMuted is true, the rest of the code is ignored
         if (isMuted === true) {
             return; 
         }
@@ -83,8 +83,8 @@
         var audio = document.getElementById('class-audio');
         if (audio) {
             audio.src = "{{ url_for('static', filename='sounds/classes/') }}" + className + ".mp3";
-            audio.volume = 0.5;
-            audio.play().catch(function(error) {
+            audio.volume = 0.2;
+            audio.play().catch(function(serror) {
                 console.log("Playback blocked: " + error);
             });
         }
