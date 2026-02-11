@@ -21,20 +21,32 @@
     </nav>
 
 
-   
-    <div class="class-selection">
-        <h2>SELECT YOUR CLASS</h2>
-        <div class="class-grid">
-            {% for cls in classes %}
-            <div class="class-card" onmouseenter="playClassSound('{{ cls }}')">
+  <div class="class-selection">
+    <h2>SELECT YOUR CLASS</h2>
+    <div class="class-grid">
+        {% for cls in classes %} <div class="class-card-container">
+            <div class="class-card" onmouseenter="playClassSound('{{ cls }}')" onclick="togglePocket('{{ cls }}')">
                 <img src="{{ url_for('static', filename='images/classes/' + cls + '.png') }}" alt="{{ cls }}">
                 <p>{{ cls.upper() }}</p>
             </div>
-            {% endfor %}
-        </div>
-    </div>
 
+            <div id="pocket-{{ cls }}" class="merc-pocket">
+                <div class="pocket-content">
+                    <span class="close-pocket" onclick="togglePocket('{{ cls }}')">✖</span>
+                    <h3>ROLE: <span class="role-text">{{ roles[cls] }}</span></h3>
+
+                
+                    <video width="320" height="180" controls class="pocket-video">
+                        <source src="{{ url_for('static', filename='videos/' + cls + '.mp4') }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+        </div> {% endfor %} </div>
+    </div>
+    
     <audio id="class-audio" style="display:none;"></audio>
+    <audio id="tv-on-sound" src="{{ url_for('static', filename='sounds/tv_on.mp3') }}" preload="auto"></audio>
 
     <script>
         var isMuted = localStorage.getItem('tf2_muted') === 'true';
@@ -89,6 +101,108 @@
             });
         }
     }
+
+    function togglePocket(className) {
+    // Stop the character's hover voice
+   
+        var classAudio = document.getElementById('class-audio');
+        if (classAudio) {
+            classAudio.pause();
+            classAudio.currentTime = 0;
+        }
+
+        var pocket = document.getElementById('pocket-' + className);
+        var tvOnSound = document.getElementById('tv-on-sound');
+
+        // Helper function to close a pocket with animation
+        function closePocket(p) {
+            if (p.classList.contains('active')) {
+                p.classList.remove('active');
+                p.classList.add('closing');
+                var v = p.querySelector('video');
+                if (v) v.pause();
+                
+                // Wait for animation to finish before hiding
+                setTimeout(() => {
+                    p.classList.remove('closing');
+                    p.style.display = 'none';
+                }, 300); 
+            }
+        }
+        
+
+        if (pocket.classList.contains('active')) {
+            closePocket(pocket);
+        } else {
+            // Close all other TVs first
+            document.querySelectorAll('.merc-pocket').forEach(p => {
+                closePocket(p);
+            });
+
+            // Open the new TV
+            if (tvOnSound && !isMuted) {
+                tvOnSound.currentTime = 0;
+                tvOnSound.play();
+            }
+
+            pocket.style.display = 'block';
+            pocket.classList.add('active');
+
+            setTimeout(() => {
+                var vid = pocket.querySelector('video');
+                if (vid) vid.play().catch(e => console.log("Autoplay blocked"));
+            }, 400);
+        }
+        setTimeout(() => {
+            if (video) {
+                video.play();
+                
+                // EASTER EGG: Only if character is heavy
+                if (className === 'heavy') {
+                    video.onended = function() {
+                        // 1. Shake and Flash
+                        pocket.classList.add('animate-shake');
+                        flash.classList.add('animate-explode');
+                        
+                        // 2. Optional: Play explosion sound
+                        console.log("BOOM! Heavy's monitor exploded.");
+
+                        // 3. Reset after explosion
+                        setTimeout(() => {
+                            pocket.classList.remove('active', 'animate-shake');
+                            flash.classList.remove('animate-explode');
+                            pocket.style.display = 'none';
+                            video.currentTime = 0;
+                        }, 700);
+                    };
+                }
+            }
+        }, 400);
+    }
+
+    
+
+    // 2. Handle closing other pockets to keep the UI clean
+    document.querySelectorAll('.merc-pocket').forEach(p => {
+        if (p.id !== 'pocket-' + className) {
+            p.style.display = 'none';
+            // Also pause any videos playing in other pockets
+            var otherVid = p.querySelector('video');
+            if (otherVid) otherVid.pause();
+        }
+    });
+
+    // 3. Toggle the current pocket
+    var pocket = document.getElementById('pocket-' + className);
+    if (pocket.style.display === "block") {
+        pocket.style.display = "none";
+        var currentVid = pocket.querySelector('video');
+        if (currentVid) currentVid.pause(); // Stop video if pocket is closed
+    } else {
+        pocket.style.display = "block";
+    }
+
+    
     </script>
 
     <div class="terminal-box" style="margin-top: 50px;">
@@ -107,27 +221,25 @@
     </div>
     
     <div class="intel-feed">
-        {% for post in posts %}
-        <div class="post-card">
-            <div class="post-header">
-                <img src="{{ url_for('static', filename='profile_pics/' + post.author.profile_pic) }}" class="circle-pfp" style="width:30px; height:30px;">
-                <strong>{{ post.author.username }}</strong>
-                <small>{{ post.date_posted.strftime('%H:%M') }}</small>
-                
-                {% if post.author == current_user %}
-                <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" style="margin-left: auto;">
-                    <button type="submit" class="redact-btn">REDACT</button>
-                </form>
-                {% endif %}
-            </div>
+    {% for post in posts %}
+    <div class="post-card">
+        <div class="post-header">
+            <span class="username">{{ post.author.username }}</span>
             
-            <p>{{ post.content }}</p>
-
-            {% if post.image_file %}
-            <img src="{{ url_for('static', filename='post_pics/' + post.image_file) }}" class="post-img">
-            {% endif %}
+            <span class="post-date">
+                {{ post.date_posted.strftime('%b %d - %H:%M') }}
+            </span>
         </div>
-        {% endfor %}
+        
+        <p class="post-content">{{ post.content }}</p>
+
+        {% if post.image_file %}
+            <div class="post-image-container">
+                <img src="{{ url_for('static', filename='post_pics/' + post.image_file) }}" class="post-img">
+            </div>
+        {% endif %}
+    </div>
+    {% endfor %}
     </div>
 
 

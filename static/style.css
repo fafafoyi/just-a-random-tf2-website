@@ -252,6 +252,13 @@ button:hover {
     transition: transform 0.3s ease;
 }
 
+.class-card-container {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .class-card img {
 
     height: 160px;
@@ -335,11 +342,21 @@ button:hover {
 
 .post-header {
     display: flex;
+    justify-content: space-between;
+    /* Pushes Username left and Date right */
     align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
     border-bottom: 1px solid #5e1b1d;
-    padding-bottom: 10px;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.post-date {
+    font-family: 'Courier New', monospace;
+    /* "Classified" terminal look */
+    font-size: 0.8rem;
+    color: #a59482;
+    /* Muted tan color */
+    text-transform: uppercase;
 }
 
 .post-img {
@@ -444,4 +461,135 @@ textarea {
     background: #b8383b;
     color: #fff;
     transform: scale(1.05);
+}
+
+/* The TV Outer Shell */
+.merc-pocket {
+    display: none;
+    position: absolute;
+    top: 105%;
+    left: 50%;
+    transform: translateX(-50%) perspective(500px) rotateX(5deg);
+    transform-origin: top center;
+    /* Fisheye tilt */
+    width: 340px;
+    background: #1a1514;
+    border: 12px solid #3d2f2b;
+    /* Thick monitor bezel */
+    border-radius: 40px / 20px;
+    /* Subtle "bulge" shape */
+    padding: 10px;
+    z-index: 1000;
+    box-shadow: inset 0 0 50px #000, 0 15px 35px rgba(0, 0, 0, 0.8);
+    overflow: hidden;
+}
+
+.merc-pocket.active {
+    display: block;
+    animation: tv-power-on 0.4s ease-out forwards;
+}
+
+.merc-pocket.closing {
+    display: block;
+    animation: tv-pop-out 0.3s ease-in forwards;
+}
+
+@keyframes tv-pop-in {
+    0% {
+        transform: translateX(-50%) scale(0);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes tv-pop-out {
+    0% {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(-50%) scale(0);
+        opacity: 0;
+    }
+}
+
+/* The REAL Static Layer */
+.merc-pocket::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.12;
+    animation: noise-jitter 0.2s steps(2) infinite;
+    /* The actual "flicker" */
+    pointer-events: none;
+    z-index: 10;
+
+}
+
+
+
+/* Fisheye Video Curvature */
+.pocket-video {
+    width: 100%;
+    border-radius: 20px;
+    filter: brightness(1.2) contrast(1.3) sepia(0.2);
+    transform: scale(1.05);
+
+    object-fit: cover;
+}
+
+@keyframes tv-power-on {
+    0% {
+        transform: translateX(-50%) perspective(500px) rotateX(20deg) scale(0);
+        opacity: 0;
+    }
+
+    60% {
+        transform: translateX(-50%) perspective(500px) rotateX(-5deg) scale(1.1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(-50%) perspective(500px) rotateX(5deg) scale(1);
+    }
+}
+
+/* The Jitter Animation */
+@keyframes noise-jitter {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(-1%, -2%);
+    }
+
+    30% {
+        transform: translate(2%, 1%);
+    }
+
+    50% {
+        transform: translate(-2%, 3%);
+    }
+
+    70% {
+        transform: translate(3%, -1%);
+    }
+
+    90% {
+        transform: translate(-1%, 1%);
+    }
+
+    100% {
+        transform: translate(1%, -2%);
+    }
 }

@@ -64,11 +64,24 @@ def index():
         db.session.add(new_post)
         db.session.commit()
         return redirect(url_for('index'))
+    
+    merc_roles = {
+        'scout': 'Offensive / Flanker',
+        'soldier': 'Offensive / Pocket',
+        'pyro': 'Offensive / Support',
+        'demoman': 'Defensive / Crowd Control',
+        'heavy': 'Defensive / Tank',
+        'engineer': 'Defensive / Utility',
+        'medic': 'Support / Healer',
+        'sniper': 'Support / Long-Range',
+        'spy': 'Support / Stealth Infiltration'
+    }
 
     # Get all posts, newest first
     posts = Post.query.order_by(Post.date_posted.desc()).all()
-    tf2_classes = ['scout', 'soldier', 'pyro', 'demoman', 'heavy', 'engineer', 'medic', 'sniper', 'spy']
-    return render_template('index.html', posts=posts, classes=tf2_classes)
+    classes_list = ['scout', 'soldier', 'pyro', 'demoman', 'heavy', 'engineer', 'medic', 'sniper', 'spy']
+ 
+    return render_template('index.html', posts=posts, classes=classes_list, roles=merc_roles)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -144,7 +157,7 @@ def delete_post(post_id):
         flash("You are not authorized to redact this Intel!")
         return redirect(url_for('index'))
     
-    # If there is an image, you might want to delete the file too
+
     if post.image_file:
         image_path = os.path.join(app.root_path, 'static/post_pics', post.image_file)
         if os.path.exists(image_path):
